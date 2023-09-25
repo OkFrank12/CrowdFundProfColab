@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
+import cloudinary from "../config/cloudinary";
 // import { publishConnection } from "../utils/connection";
 
 const prisma = new PrismaClient();
@@ -94,13 +95,3 @@ export const daleteProfile = async (req: Request, res: Response) => {
     });
   }
 };
-
-export const updateuserProfile = async (req:Request,res:Response) =>{
-    try {
-        
-    } catch (error:any) {
-        return res.status(404).json({
-            message: error.message
-        })
-    }
-}
