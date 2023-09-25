@@ -1,0 +1,1 @@
+console.log("Start no Abeg😥😥😥")
