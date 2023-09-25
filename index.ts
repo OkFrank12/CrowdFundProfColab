@@ -1,7 +1,8 @@
 import express, { Application } from "express";
+import { myApp } from "./App";
 
 const app:Application = express();
-
+myApp(app)
 const port:number = 3011
 
 const Server = app.listen(port,()=>{

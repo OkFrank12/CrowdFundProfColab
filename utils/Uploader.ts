@@ -4,8 +4,6 @@ import cloudinary from "../config/cloudinary";
 
 export const streamUpload = async (
   req: any,
-  res: Response,
-  next: NextFunction
 ) => {
   return new Promise(async (resolve, reject) => {
     const uploads = cloudinary.uploader.upload_stream((error, result) => {
