@@ -70,7 +70,7 @@ export const updateCompanyProfile = async (req: Request, res: Response) => {
         companyRole,
       },
     });
-    return res.status(HTTP_CODE.CREATE).json({
+    return res.status(HTTP_CODE.UPDATE).json({
       message: "profile",
       data: profile,
     });
@@ -88,7 +88,7 @@ export const daleteProfile = async (req: Request, res: Response) => {
     await prisma.crowdProfile.delete({
       where: { id: profileID },
     });
-    return res.status(HTTP_CODE.CREATE).json({
+    return res.status(HTTP_CODE.DELETE).json({
       message: "profile deleted",
     });
   } catch (error) {
@@ -98,22 +98,48 @@ export const daleteProfile = async (req: Request, res: Response) => {
   }
 };
 
-export const updateProfile = async (req: any, res: Response) =>{
+export const updateProfilePicture = async (req: any, res: Response) => {
   try {
-    const {profileID} = req.params.profile
-const {secure_url, public_id}: any = await streamUpload(req)
+    const { profileID } = req.params.profile
+    const { secure_url, public_id }: any = await streamUpload(req)
 
-const user = await prisma.crowdProfile.update({
-  where:{id: profileID},
-  data: {avatar:secure_url,avatarID:public_id}
-})
-return res.status(HTTP_CODE.OK).json({
-  message:"user avatar updated",
-  data:user
-})
+    const user = await prisma.crowdProfile.update({
+      where: { id: profileID },
+      data: { avatar: secure_url, avatarID: public_id }
+    })
+    return res.status(HTTP_CODE.UPDATE).json({
+      message: "user avatar updated",
+      data: user
+    })
   } catch (error) {
     return res.status(HTTP_CODE.BAD).json({
-      message:"Error udpating profile"
+      message: "Error udpating profile"
+    })
+  }
+}
+
+export const updateProfileInfo = async (req: Request, res: Response) => {
+  try {
+    const { profileID } = req.params;
+    const { telNumb, description } = req.body;
+
+    const profile = await prisma.crowdProfile.update({
+      where: { id: profileID },
+      data: {
+        telNumb,
+        description
+      }
+    })
+
+    return res.status(HTTP_CODE.UPDATE).json({
+      message: "Updated profile Information",
+      data: profile
+    })
+
+  } catch (error) {
+    return res.status(HTTP_CODE.BAD).json({
+      message: "error updating profile information",
+      data: error
     })
   }
 }
