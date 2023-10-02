@@ -1,4 +1,3 @@
-import { Response, NextFunction } from "express";
 import streamifier from "streamifier";
 import cloudinary from "../config/cloudinary";
 
