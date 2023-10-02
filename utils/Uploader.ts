@@ -2,9 +2,7 @@ import { Response, NextFunction } from "express";
 import streamifier from "streamifier";
 import cloudinary from "../config/cloudinary";
 
-export const streamUpload = async (
-  req: any,
-) => {
+export const streamUpload = async (req: any) => {
   return new Promise(async (resolve, reject) => {
     const uploads = cloudinary.uploader.upload_stream((error, result) => {
       if (result) {

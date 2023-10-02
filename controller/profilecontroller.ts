@@ -1,10 +1,8 @@
 import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
-import cloudinary from "../config/cloudinary";
 import { streamUpload } from "../utils/Uploader";
 import { HTTP_CODE } from "../error/errorSetUp";
 import { publishConnection } from "../utils/publishConnection";
-// import { publishConnection } from "../utils/connection";
 
 const prisma = new PrismaClient();
 
@@ -99,26 +97,25 @@ export const daleteProfile = async (req: Request, res: Response) => {
   }
 };
 
-
 export const updateProfilePicture = async (req: any, res: Response) => {
   try {
-    const { profileID } = req.params.profile
-    const { secure_url, public_id }: any = await streamUpload(req)
+    const { profileID } = req.params.profile;
+    const { secure_url, public_id }: any = await streamUpload(req);
 
     const user = await prisma.crowdProfile.update({
       where: { id: profileID },
-      data: { avatar: secure_url, avatarID: public_id }
-    })
+      data: { avatar: secure_url, avatarID: public_id },
+    });
     return res.status(HTTP_CODE.UPDATE).json({
       message: "user avatar updated",
-      data: user
-    })
+      data: user,
+    });
   } catch (error) {
     return res.status(HTTP_CODE.BAD).json({
-      message: "Error udpating profile"
-    })
+      message: "Error udpating profile",
+    });
   }
-}
+};
 
 export const updateProfileInfo = async (req: Request, res: Response) => {
   try {
@@ -129,19 +126,18 @@ export const updateProfileInfo = async (req: Request, res: Response) => {
       where: { id: profileID },
       data: {
         telNumb,
-        description
-      }
-    })
+        description,
+      },
+    });
 
     return res.status(HTTP_CODE.UPDATE).json({
       message: "Updated profile Information",
-      data: profile
-    })
-
+      data: profile,
+    });
   } catch (error) {
     return res.status(HTTP_CODE.BAD).json({
       message: "error updating profile information",
-      data: error
-    })
+      data: error,
+    });
   }
-}
+};
