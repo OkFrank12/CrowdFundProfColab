@@ -4,6 +4,7 @@ import morgan from "morgan";
 import helmet from "helmet";
 import { HTTP_CODE, mainError } from "./error/errorSetUp";
 import { errorHandler } from "./error/errorBuilder";
+import router from "./router/profilerouter";
 
 export const myApp = (app: Application) => {
   try {
@@ -17,6 +18,8 @@ export const myApp = (app: Application) => {
 
     app.use(helmet());
     app.use(morgan("dev"));
+
+    app.use("/api", router)
 
     app.get("/", (req: Request, res: Response) => {
       try {
