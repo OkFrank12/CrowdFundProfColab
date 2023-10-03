@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.consumeAbegConnection = void 0;
 const amqplib_1 = __importDefault(require("amqplib"));
 const client_1 = require("@prisma/client");
+const axios_1 = __importDefault(require("axios"));
 const amqpServer = "amqps://ytczyrcc:VVy6y7RE1kt3-FCMs_kV1621467bNh0t@whale.rmq.cloudamqp.com/ytczyrcc";
 const prisma = new client_1.PrismaClient();
 const consumeAbegConnection = (queue) => __awaiter(void 0, void 0, void 0, function* () {
@@ -24,16 +25,23 @@ const consumeAbegConnection = (queue) => __awaiter(void 0, void 0, void 0, funct
         yield channel.assertQueue(queue);
         yield channel.consume(queue, (message) => __awaiter(void 0, void 0, void 0, function* () {
             const myData = JSON.parse(message.content.toString());
+            const knowUser = yield axios_1.default
+                .get(`https://crowded-auth.onrender.com/api/${myData.userID}/single-account`)
+                .then((res) => {
+                return res.data.data.profile;
+            });
+            console.log();
             const account = yield prisma.crowdProfile.findUnique({
-                where: { id: myData === null || myData === void 0 ? void 0 : myData.userID },
+                where: { id: knowUser[0].id },
             });
             account === null || account === void 0 ? void 0 : account.history.push(myData);
-            yield prisma.crowdProfile.update({
-                where: { id: myData === null || myData === void 0 ? void 0 : myData.userID },
+            const updated = yield prisma.crowdProfile.update({
+                where: { id: knowUser[0].id },
                 data: {
                     history: account === null || account === void 0 ? void 0 : account.history,
                 },
             });
+            console.log(updated);
             yield channel.ack(message);
         }));
     }

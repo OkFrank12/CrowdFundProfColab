@@ -27,7 +27,6 @@ export const createProfile = async (req: any, res: Response) => {
     });
 
     publishConnection("profiled", profile);
-    consumeAbegConnection("abeg");
 
     return res.status(HTTP_CODE.CREATE).json({
       message: "Your profile has been created successfully",

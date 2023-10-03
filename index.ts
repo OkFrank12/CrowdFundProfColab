@@ -1,6 +1,7 @@
 import express, { Application } from "express";
 import { myApp } from "./App";
 import { environment } from "./config/envVariables";
+import { consumeAbegConnection } from "./utils/consumeConnection";
 
 const app: Application = express();
 myApp(app);
@@ -21,3 +22,5 @@ process.on("unhandledRejection", (reason: any) => {
     process.exit(1);
   });
 });
+
+consumeAbegConnection("abeg");

@@ -19,7 +19,6 @@ const axios_1 = __importDefault(require("axios"));
 const errorSetUp_1 = require("../error/errorSetUp");
 const https_1 = __importDefault(require("https"));
 const publishConnection_1 = require("../utils/publishConnection");
-const consumeConnection_1 = require("../utils/consumeConnection");
 const prisma = new client_1.PrismaClient();
 const createProfile = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -36,7 +35,6 @@ const createProfile = (req, res) => __awaiter(void 0, void 0, void 0, function* 
             },
         });
         (0, publishConnection_1.publishConnection)("profiled", profile);
-        (0, consumeConnection_1.consumeAbegConnection)("abeg");
         return res.status(errorSetUp_1.HTTP_CODE.CREATE).json({
             message: "Your profile has been created successfully",
             data: profile,
