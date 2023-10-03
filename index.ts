@@ -1,9 +1,10 @@
 import express, { Application } from "express";
 import { myApp } from "./App";
+import { environment } from "./config/envVariables";
 
-const app:Application = express();
+const app: Application = express();
 myApp(app)
-const port:number = 3011
+const port: number = parseInt(environment.PORT)
 
 const Server = app.listen(port, () => {
   console.log("Server listening on port");
