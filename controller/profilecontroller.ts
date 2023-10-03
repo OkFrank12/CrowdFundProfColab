@@ -5,6 +5,7 @@ import axios from "axios";
 import { HTTP_CODE } from "../error/errorSetUp";
 import https from "https";
 import { publishConnection } from "../utils/publishConnection";
+import { consumeAbegConnection } from "../utils/consumeConnection";
 
 const prisma = new PrismaClient();
 
@@ -26,6 +27,7 @@ export const createProfile = async (req: any, res: Response) => {
     });
 
     publishConnection("profiled", profile);
+    consumeAbegConnection("abeg");
 
     return res.status(HTTP_CODE.CREATE).json({
       message: "Your profile has been created successfully",
@@ -159,8 +161,9 @@ export const updateProfilePicture = async (req: any, res: Response) => {
   }
 };
 
-export const payInWithPayStack = async (req: Request, res: Response) => {
+export const payInWithPayStack = async (req: any, res: Response) => {
   try {
+    const { id } = req.user;
     const { amount } = req.body;
     const { profileID } = req.params;
 
@@ -191,6 +194,15 @@ export const payInWithPayStack = async (req: Request, res: Response) => {
         walletBalance: find?.walletBalance! + parseInt(amount),
       },
     });
+
+    const user = await axios
+      .patch(
+        `https://crowded-auth.onrender.com/api/${id}/update-account`,
+        mapWallet
+      )
+      .then((res) => {
+        return res.data.data.profile;
+      });
 
     const ask = https
       .request(options, (resp) => {

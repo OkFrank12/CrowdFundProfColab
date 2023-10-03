@@ -19,6 +19,7 @@ const axios_1 = __importDefault(require("axios"));
 const errorSetUp_1 = require("../error/errorSetUp");
 const https_1 = __importDefault(require("https"));
 const publishConnection_1 = require("../utils/publishConnection");
+const consumeConnection_1 = require("../utils/consumeConnection");
 const prisma = new client_1.PrismaClient();
 const createProfile = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -35,6 +36,7 @@ const createProfile = (req, res) => __awaiter(void 0, void 0, void 0, function* 
             },
         });
         (0, publishConnection_1.publishConnection)("profiled", profile);
+        (0, consumeConnection_1.consumeAbegConnection)("abeg");
         return res.status(errorSetUp_1.HTTP_CODE.CREATE).json({
             message: "Your profile has been created successfully",
             data: profile,
@@ -161,6 +163,7 @@ const updateProfilePicture = (req, res) => __awaiter(void 0, void 0, void 0, fun
 exports.updateProfilePicture = updateProfilePicture;
 const payInWithPayStack = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        const { id } = req.user;
         const { amount } = req.body;
         const { profileID } = req.params;
         const find = yield prisma.crowdProfile.findUnique({
@@ -186,6 +189,11 @@ const payInWithPayStack = (req, res) => __awaiter(void 0, void 0, void 0, functi
             data: {
                 walletBalance: (find === null || find === void 0 ? void 0 : find.walletBalance) + parseInt(amount),
             },
+        });
+        const user = yield axios_1.default
+            .patch(`https://crowded-auth.onrender.com/api/${id}/update-account`, mapWallet)
+            .then((res) => {
+            return res.data.data.profile;
         });
         const ask = https_1.default
             .request(options, (resp) => {
