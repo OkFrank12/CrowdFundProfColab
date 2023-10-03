@@ -19,7 +19,7 @@ export const myApp = (app: Application) => {
     app.use(helmet());
     app.use(morgan("dev"));
 
-    app.use("/api", router)
+    app.use("/api", router);
 
     app.get("/", (req: Request, res: Response) => {
       try {

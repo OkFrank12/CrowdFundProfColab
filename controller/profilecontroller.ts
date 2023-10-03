@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
 import { streamUpload } from "../utils/Uploader";
+import axios from "axios";
 import { HTTP_CODE } from "../error/errorSetUp";
 import { publishConnection } from "../utils/publishConnection";
 
@@ -24,7 +25,7 @@ export const createProfile = async (req: any, res: Response) => {
       },
     });
 
-    publishConnection("profile", profile);
+    publishConnection("profiled", profile);
 
     return res.status(HTTP_CODE.CREATE).json({
       message: "Your profile has been created successfully",
@@ -56,12 +57,13 @@ export const viewProfile = async (req: Request, res: Response) => {
   }
 };
 
-export const updateCompanyProfile = async (req: Request, res: Response) => {
+export const updateCompanyProfile = async (req: any, res: Response) => {
   try {
+    const { id } = req.user;
     const { profileID } = req.params;
     const { companyName, companyLocation, companyRole } = req.body;
 
-    const profile = await prisma.crowdProfile.update({
+    const updatedData = await prisma.crowdProfile.update({
       where: { id: profileID },
       data: {
         companyName,
@@ -70,15 +72,27 @@ export const updateCompanyProfile = async (req: Request, res: Response) => {
       },
     });
 
-    publishConnection("profile", profile);
+    console.log("view: ", id);
+
+    const data = await axios
+      .patch(
+        `https://crowded-auth.onrender.com/api/${id}/update-account`,
+        updatedData
+      )
+      .then((res) => {
+        return res.data.data.profile;
+      });
+
+    console.log(updatedData);
+
     return res.status(HTTP_CODE.UPDATE).json({
       message: "profile",
-      data: profile,
+      data,
     });
-  } catch (error) {
+  } catch (error: any) {
     return res.status(HTTP_CODE.BAD).json({
-      message: "Error",
-      data:error
+      message: "error updating company info",
+      data: error.message,
     });
   }
 };
@@ -102,30 +116,36 @@ export const daleteProfile = async (req: Request, res: Response) => {
 
 export const updateProfilePicture = async (req: any, res: Response) => {
   try {
-    const { profileID } = req.params
-    
-    const { secure_url, public_id }: any = await streamUpload(req)
+    const { id } = req.user;
+    const { profileID } = req.params;
+    const { secure_url, public_id }: any = await streamUpload(req);
+
     const user = await prisma.crowdProfile.update({
       where: { id: profileID },
-      data: { avatar: secure_url, avatarID: public_id }
-    })
-    
-    publishConnection("profile", user);
-    
+      data: { avatar: secure_url, avatarID: public_id },
+    });
+
+    const data = await axios
+      .patch(`https://crowded-auth.onrender.com/api/${id}/update-account`, user)
+      .then((res) => {
+        return res.data.data.profile;
+      });
+
     return res.status(HTTP_CODE.UPDATE).json({
       message: "user avatar updated",
-      data: user
-    })
+      data,
+    });
   } catch (error: any) {
     return res.status(HTTP_CODE.BAD).json({
-      message: "Error udpating profile",
-      data: error.message
-    })
+      message: "Error udpating profile avatar",
+      data: error.message,
+    });
   }
-}
+};
 
-export const updateProfileInfo = async (req: Request, res: Response) => {
+export const updateProfileInfo = async (req: any, res: Response) => {
   try {
+    const { id } = req.user;
     const { profileID } = req.params;
     const { telNumb, description } = req.body;
 
@@ -133,21 +153,27 @@ export const updateProfileInfo = async (req: Request, res: Response) => {
       where: { id: profileID },
       data: {
         telNumb,
-        description
-      }
-    })
+        description,
+      },
+    });
 
-    publishConnection("profile", profile);
+    const data = await axios
+      .patch(
+        `https://crowded-auth.onrender.com/api/${id}/update-account`,
+        profile
+      )
+      .then((res) => {
+        return res.data.data.profile;
+      });
 
     return res.status(HTTP_CODE.UPDATE).json({
       message: "Updated profile Information",
-      data: profile
-    })
-
-  } catch (error) {
+      data,
+    });
+  } catch (error: any) {
     return res.status(HTTP_CODE.BAD).json({
       message: "error updating profile information",
-      data: error
-    })
+      data: error.message,
+    });
   }
-}
+};
