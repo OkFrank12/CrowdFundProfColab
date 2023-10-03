@@ -5,10 +5,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const App_1 = require("./App");
+const envVariables_1 = require("./config/envVariables");
 const app = (0, express_1.default)();
 (0, App_1.myApp)(app);
-const port = 3011;
-const Server = app.listen(port, () => {
+const port = parseInt(envVariables_1.environment.PORT);
+const Server = app.listen(process.env.PORT || port, () => {
     console.log("Server listening on port");
 });
 process.on("uncaughtException", (error) => {

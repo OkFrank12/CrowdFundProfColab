@@ -14,6 +14,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.publishConnection = void 0;
 const amqplib_1 = __importDefault(require("amqplib"));
+// const amqplibServer =
+//   "amqps://ytczyrcc:VVy6y7RE1kt3-FCMs_kV1621467bNh0t@whale.rmq.cloudamqp.com/ytczyrcc";
 const amqplibServer = "amqps://ytczyrcc:VVy6y7RE1kt3-FCMs_kV1621467bNh0t@whale.rmq.cloudamqp.com/ytczyrcc";
 const publishConnection = (queue, data) => __awaiter(void 0, void 0, void 0, function* () {
     try {
