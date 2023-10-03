@@ -2,9 +2,11 @@ import express from "express";
 import {
   createProfile,
   daleteProfile,
+  payInWithPayStack,
   updateCompanyProfile,
   updateProfileInfo,
   updateProfilePicture,
+  viewAllProfile,
   viewProfile,
 } from "../controller/profilecontroller";
 import { authorizeProfileCreation } from "../utils/authorization";
@@ -20,6 +22,7 @@ router
   .patch(authorizeProfileCreation, updateCompanyProfile);
 
 router.route("/:profileID/view-profile").get(viewProfile);
+router.route("/all").get(viewAllProfile);
 
 router
   .route("/:profileID/update-profile")
@@ -30,5 +33,9 @@ router.route("/:profileID/delete-profile").delete(daleteProfile);
 router
   .route("/:profileID/update-profile-pics")
   .patch(authorizeProfileCreation, myUploader, updateProfilePicture);
+
+router
+  .route("/:profileID/pay-in")
+  .patch(authorizeProfileCreation, payInWithPayStack);
 
 export default router;

@@ -3,18 +3,19 @@ import { Request, Response } from "express";
 import { streamUpload } from "../utils/Uploader";
 import axios from "axios";
 import { HTTP_CODE } from "../error/errorSetUp";
+import https from "https";
 import { publishConnection } from "../utils/publishConnection";
 
 const prisma = new PrismaClient();
 
 export const createProfile = async (req: any, res: Response) => {
   try {
-    const { id } = req.user;
+    const { id, email } = req.user;
     const { fullName, userName } = req.body;
 
     const profile = await prisma.crowdProfile.create({
       data: {
-        email: "email",
+        email,
         userID: id,
 
         fullName,
@@ -53,6 +54,22 @@ export const viewProfile = async (req: Request, res: Response) => {
   } catch (error) {
     return res.status(HTTP_CODE.BAD).json({
       message: "Error",
+    });
+  }
+};
+
+export const viewAllProfile = async (req: Request, res: Response) => {
+  try {
+    const all = await prisma.crowdProfile.findMany({});
+
+    return res.status(HTTP_CODE.OK).json({
+      message: "profile",
+      data: all,
+    });
+  } catch (error: any) {
+    return res.status(HTTP_CODE.BAD).json({
+      message: "error viewing all profile",
+      data: error.message,
     });
   }
 };
@@ -138,6 +155,69 @@ export const updateProfilePicture = async (req: any, res: Response) => {
   } catch (error: any) {
     return res.status(HTTP_CODE.BAD).json({
       message: "Error udpating profile avatar",
+      data: error.message,
+    });
+  }
+};
+
+export const payInWithPayStack = async (req: Request, res: Response) => {
+  try {
+    const { amount } = req.body;
+    const { profileID } = req.params;
+
+    const find = await prisma.crowdProfile.findUnique({
+      where: { id: profileID },
+    });
+
+    const params = JSON.stringify({
+      email: "peter@test.com",
+      amount: parseInt(amount),
+      // email: find?.email,
+    });
+    const options = {
+      hostname: "api.paystack.co",
+      port: 443,
+      path: "/transaction/initialize",
+      method: "POST",
+      headers: {
+        Authorization:
+          "Bearer sk_test_ec1b0ccabcb547fe0efbd991f3b64b485903c88e",
+        "Content-Type": "application/json",
+      },
+    };
+
+    const mapWallet = await prisma.crowdProfile.update({
+      where: { id: find?.id },
+      data: {
+        walletBalance: find?.walletBalance! + parseInt(amount),
+      },
+    });
+
+    const ask = https
+      .request(options, (resp) => {
+        let data = "";
+        resp.on("data", (chunk) => {
+          data += chunk;
+        });
+
+        resp.on("end", () => {
+          console.log(JSON.parse(data));
+          res.status(HTTP_CODE.OK).json({
+            message: "Payment successful",
+            data: JSON.parse(data),
+            wallet: mapWallet,
+          });
+        });
+      })
+      .on("error", (error) => {
+        console.error(error);
+      });
+
+    ask.write(params);
+    ask.end();
+  } catch (error: any) {
+    return res.status(HTTP_CODE.BAD).json({
+      message: "Error making Payment",
       data: error.message,
     });
   }
