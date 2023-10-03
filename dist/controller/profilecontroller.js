@@ -22,12 +22,12 @@ const publishConnection_1 = require("../utils/publishConnection");
 const prisma = new client_1.PrismaClient();
 const createProfile = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { id, email } = req.user;
+        const { id } = req.user;
         const { fullName, userName } = req.body;
         const profile = yield prisma.crowdProfile.create({
             data: {
-                email,
                 userID: id,
+                email: "",
                 fullName,
                 userName,
                 walletBalance: 0,
@@ -43,7 +43,7 @@ const createProfile = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     catch (error) {
         return res.status(errorSetUp_1.HTTP_CODE.BAD).json({
             message: "Error",
-            data: error,
+            data: error.message,
         });
     }
 });

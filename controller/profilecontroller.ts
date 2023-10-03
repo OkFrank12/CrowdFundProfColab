@@ -10,14 +10,13 @@ const prisma = new PrismaClient();
 
 export const createProfile = async (req: any, res: Response) => {
   try {
-    const { id, email } = req.user;
+    const { id } = req.user;
     const { fullName, userName } = req.body;
 
     const profile = await prisma.crowdProfile.create({
       data: {
-        email,
         userID: id,
-
+        email: "",
         fullName,
         userName,
 
@@ -32,10 +31,10 @@ export const createProfile = async (req: any, res: Response) => {
       message: "Your profile has been created successfully",
       data: profile,
     });
-  } catch (error) {
+  } catch (error: any) {
     return res.status(HTTP_CODE.BAD).json({
       message: "Error",
-      data: error,
+      data: error.message,
     });
   }
 };
